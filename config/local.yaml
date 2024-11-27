@@ -1,0 +1,15 @@
+environment: "local" #local, dev, prod
+token_ttl: 1h
+database:
+  host: "localhost"
+  port: "5433"
+  user: "postgres"
+  db_name: "users"
+  password: "postgres"
+  ssl_mode: "disable"
+
+http_server:
+  address: "localhost"
+  port: "8085"
+  timeout: 4s
+  idle_timeout: 60s
