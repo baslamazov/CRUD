@@ -1,5 +1,4 @@
-
--- Подключаем расширение для генерации UUID, если оно еще не включено
+-- Подключаем расширение для генерации UUID, если оно еще не включено  
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Вставляем группы
@@ -14,18 +13,18 @@ WITH group_ids AS (
 
 -- Вставляем песни
      song_data AS (
-INSERT INTO songs (id, group_id, song, release_date, link)
-SELECT gen_random_uuid(), gid.id, s.song, s.release_date, s.link
-FROM (
-         VALUES
-             ('Zeig dich', '2019-05-17', 'https://example.com/rammstein/zeig_dich', 'Rammstein'),
-             ('Reise, Reise', '2004-09-27', 'https://example.com/rammstein/reise_reise', 'Rammstein'),
-             ('Links 2 3 4', '2001-05-14', 'https://example.com/rammstein/links_2_3_4', 'Rammstein'),
-             ('Thunderstruck', '1990-09-10', 'https://example.com/acdc/thunderstruck', 'AC/DC')
-     ) AS s (song, release_date, link, group_name)
-         JOIN group_ids gid ON gid.name = s.group_name
-    RETURNING id, group_id, song
-)
+         INSERT INTO songs (id, group_id, name, release_date, link)
+             SELECT gen_random_uuid(), gid.id, s.name, s.release_date::date, s.link
+             FROM (
+                      VALUES
+                          ('Zeig dich', '2019-05-17', 'https://example.com/rammstein/zeig_dich', 'Rammstein'),
+                          ('Reise, Reise', '2004-09-27', 'https://example.com/rammstein/reise_reise', 'Rammstein'),
+                          ('Links 2 3 4', '2001-05-14', 'https://example.com/rammstein/links_2_3_4', 'Rammstein'),
+                          ('Thunderstruck', '1990-09-10', 'https://example.com/acdc/thunderstruck', 'AC/DC')
+                  ) AS s (name, release_date, link, group_name)
+                      JOIN group_ids gid ON gid.name = s.group_name
+             RETURNING id, group_id, name
+     )
 
 -- Подготавливаем данные для вставки текстов песен
 SELECT
@@ -35,9 +34,9 @@ SELECT
     v.text
 INTO TEMP TABLE lyrics_temp
 FROM song_data sd
-    JOIN (
+         JOIN (
     -- Куплеты для 'Zeig dich' группы 'Rammstein'
-    SELECT 'Zeig dich' AS song, 1 AS verse_number, 'Куплет 1 для Zeig dich' AS text
+    SELECT 'Zeig dich' AS name, 1 AS verse_number, 'Куплет 1 для Zeig dich' AS text
     UNION ALL
     SELECT 'Zeig dich', 2, 'Куплет 2 для Zeig dich' AS text
     UNION ALL
@@ -70,7 +69,7 @@ FROM song_data sd
     UNION ALL
     SELECT 'Thunderstruck', 3, 'Куплет 3 для Thunderstruck' AS text
     -- Добавьте остальные куплеты для 'Thunderstruck' здесь
-    ) v ON sd.song = v.song;
+) v ON sd.name = v.name;
 
 -- Вставляем тексты песен (куплеты)
 INSERT INTO lyrics (song_id, group_id, verse_number, text)
@@ -78,4 +77,3 @@ SELECT song_id, group_id, verse_number, text FROM lyrics_temp;
 
 -- Удаляем временную таблицу
 DROP TABLE lyrics_temp;
-

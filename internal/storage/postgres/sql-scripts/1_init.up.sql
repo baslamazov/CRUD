@@ -1,14 +1,11 @@
 -- Создаем базу данных users  
 CREATE DATABASE EffectiveMobile;
 
--- Подключаемся к базе данных users  
 \c EffectiveMobile;
-
-SET NAMES = 'utf8';
 
 -- Удаляем таблицы, если они существуют
 DROP TABLE IF EXISTS songs;
-DROP TABLE IF EXISTS groups;
+DROP TABLE IF EXISTS "groups";
 DROP TABLE IF EXISTS lyrics;
 
 -- Включаем расширение pgcrypto для генерации UUID
@@ -24,7 +21,7 @@ CREATE TABLE groups (
 CREATE TABLE songs (
                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                        group_id UUID NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
-                       song TEXT NOT NULL,
+                       name TEXT NOT NULL,
                        release_date DATE,
                        link TEXT
 );
