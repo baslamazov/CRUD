@@ -22,8 +22,9 @@ func New(conf *config.Config, log *slog.Logger) (*App, error) {
 	app := &App{
 		log: log,
 	}
+	// TODO: проверить показатели производительности, если каждому выделать отдельный сервис с пулом соединений
 	storage := postgres.NewDBService(conf.Database)
-	app.service = services.New(log, storage, storage)
+	app.service = services.New(log, storage, storage, storage)
 	app.handler = endpoint.New(app.service)
 	return app, nil
 }
@@ -35,9 +36,13 @@ func (app *App) Start() error {
 	r.Use(middleware.Logger)
 
 	r.Use(middleware.Recoverer)
-	r.Route("/info", func(r chi.Router) {
+	r.Route("/library", func(r chi.Router) {
+		r.With(middleware.Heartbeat("/ping")).Get("/song", app.handler.GetSong)
+		r.With(middleware.Heartbeat("/ping")).Delete("/song", app.handler.DeleteSong)
+		r.With(middleware.Heartbeat("/ping")).Post("/song", func(writer http.ResponseWriter, request *http.Request) {
 
-		r.With(middleware.Heartbeat("/ping")).Get("/", app.handler.GetLibrary)
+		})
+		r.With(middleware.Heartbeat("/ping")).Get("/lyric", app.handler.GetLyric)
 
 	})
 	go func() {

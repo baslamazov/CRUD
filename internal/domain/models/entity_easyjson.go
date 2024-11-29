@@ -184,8 +184,8 @@ func easyjson163c17a9DecodeEffectiveMobileInternalDomainModels2(in *jlexer.Lexer
 		switch key {
 		case "id":
 			out.ID = string(in.String())
-		case "group_id":
-			out.GroupID = string(in.String())
+		case "group_name":
+			out.GroupName = string(in.String())
 		case "song":
 			out.Name = string(in.String())
 		case "release_date":
@@ -212,9 +212,9 @@ func easyjson163c17a9EncodeEffectiveMobileInternalDomainModels2(out *jwriter.Wri
 		out.String(string(in.ID))
 	}
 	{
-		const prefix string = ",\"group_id\":"
+		const prefix string = ",\"group_name\":"
 		out.RawString(prefix)
-		out.String(string(in.GroupID))
+		out.String(string(in.GroupName))
 	}
 	{
 		const prefix string = ",\"song\":"
@@ -257,7 +257,73 @@ func (v *Song) UnmarshalJSON(data []byte) error {
 func (v *Song) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels2(l, v)
 }
-func easyjson163c17a9DecodeEffectiveMobileInternalDomainModels3(in *jlexer.Lexer, out *Lyric) {
+func easyjson163c17a9DecodeEffectiveMobileInternalDomainModels3(in *jlexer.Lexer, out *Lyrics) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		in.Skip()
+		*out = nil
+	} else {
+		in.Delim('[')
+		if *out == nil {
+			if !in.IsDelim(']') {
+				*out = make(Lyrics, 0, 2)
+			} else {
+				*out = Lyrics{}
+			}
+		} else {
+			*out = (*out)[:0]
+		}
+		for !in.IsDelim(']') {
+			var v4 Lyric
+			(v4).UnmarshalEasyJSON(in)
+			*out = append(*out, v4)
+			in.WantComma()
+		}
+		in.Delim(']')
+	}
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson163c17a9EncodeEffectiveMobileInternalDomainModels3(out *jwriter.Writer, in Lyrics) {
+	if in == nil && (out.Flags&jwriter.NilSliceAsEmpty) == 0 {
+		out.RawString("null")
+	} else {
+		out.RawByte('[')
+		for v5, v6 := range in {
+			if v5 > 0 {
+				out.RawByte(',')
+			}
+			(v6).MarshalEasyJSON(out)
+		}
+		out.RawByte(']')
+	}
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v Lyrics) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels3(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v Lyrics) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels3(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *Lyrics) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels3(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *Lyrics) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels3(l, v)
+}
+func easyjson163c17a9DecodeEffectiveMobileInternalDomainModels4(in *jlexer.Lexer, out *Lyric) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -290,7 +356,7 @@ func easyjson163c17a9DecodeEffectiveMobileInternalDomainModels3(in *jlexer.Lexer
 		in.Consumed()
 	}
 }
-func easyjson163c17a9EncodeEffectiveMobileInternalDomainModels3(out *jwriter.Writer, in Lyric) {
+func easyjson163c17a9EncodeEffectiveMobileInternalDomainModels4(out *jwriter.Writer, in Lyric) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -310,27 +376,27 @@ func easyjson163c17a9EncodeEffectiveMobileInternalDomainModels3(out *jwriter.Wri
 // MarshalJSON supports json.Marshaler interface
 func (v Lyric) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels3(&w, v)
+	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Lyric) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels3(w, v)
+	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Lyric) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels3(&r, v)
+	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Lyric) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels3(l, v)
+	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels4(l, v)
 }
-func easyjson163c17a9DecodeEffectiveMobileInternalDomainModels4(in *jlexer.Lexer, out *Group) {
+func easyjson163c17a9DecodeEffectiveMobileInternalDomainModels5(in *jlexer.Lexer, out *Group) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -363,7 +429,7 @@ func easyjson163c17a9DecodeEffectiveMobileInternalDomainModels4(in *jlexer.Lexer
 		in.Consumed()
 	}
 }
-func easyjson163c17a9EncodeEffectiveMobileInternalDomainModels4(out *jwriter.Writer, in Group) {
+func easyjson163c17a9EncodeEffectiveMobileInternalDomainModels5(out *jwriter.Writer, in Group) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -383,23 +449,23 @@ func easyjson163c17a9EncodeEffectiveMobileInternalDomainModels4(out *jwriter.Wri
 // MarshalJSON supports json.Marshaler interface
 func (v Group) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels4(&w, v)
+	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Group) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels4(w, v)
+	easyjson163c17a9EncodeEffectiveMobileInternalDomainModels5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Group) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels4(&r, v)
+	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Group) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels4(l, v)
+	easyjson163c17a9DecodeEffectiveMobileInternalDomainModels5(l, v)
 }

@@ -11,7 +11,7 @@ type Group struct {
 //easyjson:json
 type Song struct {
 	ID          string `json:"id"`
-	GroupID     string `json:"group_id"`
+	GroupName   string `json:"group_name"`
 	Name        string `json:"song"`
 	ReleaseDate string `json:"release_date"`
 	Link        string `json:"link"`
@@ -32,3 +32,6 @@ type SongDetail struct {
 
 //easyjson:json
 type Songs []Song
+
+//easyjson:json
+type Lyrics []Lyric
