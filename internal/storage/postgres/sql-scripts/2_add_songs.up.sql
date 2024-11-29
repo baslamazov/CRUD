@@ -1,12 +1,9 @@
--- Подключаем расширение для генерации UUID, если оно еще не включено  
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- Вставляем группы
 INSERT INTO groups (id, name) VALUES
                                   (gen_random_uuid(), 'Rammstein'),
                                   (gen_random_uuid(), 'AC/DC');
 
--- Получаем ID групп для использования в дальнейшем
 WITH group_ids AS (
     SELECT id, name FROM groups WHERE name IN ('Rammstein', 'AC/DC')
 ),
@@ -25,8 +22,6 @@ WITH group_ids AS (
                       JOIN group_ids gid ON gid.name = s.group_name
              RETURNING id, group_id, name
      )
-
--- Подготавливаем данные для вставки текстов песен
 SELECT
     sd.id AS song_id,
     sd.group_id AS group_id,
@@ -41,7 +36,6 @@ FROM song_data sd
     SELECT 'Zeig dich', 2, 'Куплет 2 для Zeig dich' AS text
     UNION ALL
     SELECT 'Zeig dich', 3, 'Куплет 3 для Zeig dich' AS text
-    -- Добавьте остальные куплеты для 'Zeig dich' здесь
 
     UNION ALL
     -- Куплеты для 'Reise, Reise' группы 'Rammstein'
@@ -50,7 +44,6 @@ FROM song_data sd
     SELECT 'Reise, Reise', 2, 'Куплет 2 для Reise, Reise' AS text
     UNION ALL
     SELECT 'Reise, Reise', 3, 'Куплет 3 для Reise, Reise' AS text
-    -- Добавьте остальные куплеты для 'Reise, Reise' здесь
 
     UNION ALL
     -- Куплеты для 'Links 2 3 4' группы 'Rammstein'
@@ -59,7 +52,6 @@ FROM song_data sd
     SELECT 'Links 2 3 4', 2, 'Куплет 2 для Links 2 3 4' AS text
     UNION ALL
     SELECT 'Links 2 3 4', 3, 'Куплет 3 для Links 2 3 4' AS text
-    -- Добавьте остальные куплеты для 'Links 2 3 4' здесь
 
     UNION ALL
     -- Куплеты для 'Thunderstruck' группы 'AC/DC'
@@ -68,12 +60,9 @@ FROM song_data sd
     SELECT 'Thunderstruck', 2, 'Куплет 2 для Thunderstruck' AS text
     UNION ALL
     SELECT 'Thunderstruck', 3, 'Куплет 3 для Thunderstruck' AS text
-    -- Добавьте остальные куплеты для 'Thunderstruck' здесь
 ) v ON sd.name = v.name;
 
--- Вставляем тексты песен (куплеты)
 INSERT INTO lyrics (song_id, group_id, verse_number, text)
 SELECT song_id, group_id, verse_number, text FROM lyrics_temp;
 
--- Удаляем временную таблицу
 DROP TABLE lyrics_temp;

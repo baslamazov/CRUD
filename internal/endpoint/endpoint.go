@@ -48,7 +48,6 @@ func (ep *Endpoint) GetSong(w http.ResponseWriter, r *http.Request) {
 
 	songs, _ := ep.service.GetSong(r.Context(), songName, groupName, releaseDate, limit, offset)
 
-	// Возвращаем ответ в формате JSON
 	responseBody, err := songs.MarshalJSON()
 	if err != nil {
 		http.Error(w, "Ошибка формирования ответа", http.StatusInternalServerError)
@@ -132,7 +131,6 @@ func (ep *Endpoint) AddSong(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Вызов сервисного слоя
 	success, _ := ep.service.NewSong(r.Context(), input)
 	if success != true {
 		http.Error(w, "Ошибка добавления песни", http.StatusBadRequest)

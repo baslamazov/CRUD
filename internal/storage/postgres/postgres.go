@@ -23,12 +23,12 @@ func NewDBService(cfg config.Database) *Storage {
 }
 
 func CreatePool(constr string) *pgxpool.Pool {
-	config, err := pgxpool.ParseConfig(constr)
+	cfg, err := pgxpool.ParseConfig(constr)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	pool, err := pgxpool.NewWithConfig(context.Background(), cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,39 +43,28 @@ func (db *Storage) Song(ctx context.Context,
 	limit int,
 	offset int,
 ) (models.Songs, error) {
-	// Проверяем соединение с базой данных
 	if err := db.db.Ping(ctx); err != nil {
 		return nil, err
 	}
-
-	// Получаем соединение из пула
 	conn, err := db.db.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Release()
-
-	// Начинаем транзакцию
 	tx, err := conn.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback(ctx)
-
-	// Строим базовый SQL-запрос для выборки песен
 	queryBuilder := strings.Builder{}
 	queryBuilder.WriteString(`  
         SELECT songs.id, songs.name, songs.release_date, songs.link, groups.name AS group_name  
         FROM songs  
         JOIN groups ON songs.group_id = groups.id  
     `)
-
-	// Список условий и аргументов для фильтрации
 	var conditions []string
 	var args []interface{}
 	argID := 1
-
-	// Добавляем фильтры, если параметры не пустые
 	if songName != "" {
 		conditions = append(conditions, fmt.Sprintf("songs.name ILIKE $%d", argID))
 		args = append(args, "%"+songName+"%")
@@ -93,30 +82,21 @@ func (db *Storage) Song(ctx context.Context,
 		args = append(args, releaseDate)
 		argID++
 	}
-
-	// Если есть условия, добавляем их в запрос
 	if len(conditions) > 0 {
 		queryBuilder.WriteString(" WHERE ")
 		queryBuilder.WriteString(strings.Join(conditions, " AND "))
 	}
-
-	// Добавляем сортировку по ID песни (при необходимости можно изменить поле сортировки)
 	queryBuilder.WriteString(" ORDER BY songs.id")
-
-	// Устанавливаем значения по умолчанию для пагинации
 	if limit <= 0 {
-		limit = 10 // Значение по умолчанию
+		limit = 10
 	}
 
-	// Добавляем параметры LIMIT и OFFSET в запрос
 	queryBuilder.WriteString(fmt.Sprintf(" LIMIT $%d OFFSET $%d", argID, argID+1))
 	args = append(args, limit, offset)
 	argID += 2
 
-	// Получаем итоговый запрос
 	query := queryBuilder.String()
 
-	// Выполняем запрос для получения песен
 	rows, err := tx.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
@@ -125,7 +105,6 @@ func (db *Storage) Song(ctx context.Context,
 
 	var songs models.Songs
 
-	// Обрабатываем результаты запроса песен
 	for rows.Next() {
 		var song models.Song
 		var releaseDate sql.NullTime
@@ -134,7 +113,6 @@ func (db *Storage) Song(ctx context.Context,
 			return nil, err
 		}
 
-		// Обработка NULL значений даты выпуска
 		if releaseDate.Valid {
 			song.ReleaseDate = releaseDate.Time.Format("2006-01-02")
 		} else {
@@ -144,12 +122,10 @@ func (db *Storage) Song(ctx context.Context,
 		songs = append(songs, song)
 	}
 
-	// Проверяем ошибки при итерации результатов
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	// Фиксируем транзакцию
 	if err = tx.Commit(ctx); err != nil {
 		return nil, err
 	}
@@ -162,31 +138,24 @@ func (db *Storage) Lyric(ctx context.Context,
 	limit int,
 	offset int,
 ) (models.Lyrics, error) {
-	// Проверяем соединение с базой данных
 	if err := db.db.Ping(ctx); err != nil {
 		return nil, err
 	}
-
-	// Получаем соединение из пула
 	conn, err := db.db.Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Release()
-
-	// Начинаем транзакцию
 	tx, err := conn.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback(ctx)
 
-	// Проверяем, что songName и groupName не пустые
 	if songName == "" || groupName == "" {
-		return nil, errors.New("songName and groupName must be provided")
+		return nil, errors.New("songName и groupName должны быть заполнены")
 	}
 
-	// Строим SQL-запрос для выборки куплетов с пагинацией
 	query := `  
 		SELECT l.verse_number, l.text  
 		FROM lyrics l  
@@ -197,7 +166,6 @@ func (db *Storage) Lyric(ctx context.Context,
 		LIMIT $3 OFFSET $4  
 	`
 
-	// Выполняем запрос
 	rows, err := tx.Query(ctx, query, "%"+songName+"%", "%"+groupName+"%", limit, offset)
 	if err != nil {
 		return nil, err
@@ -206,7 +174,6 @@ func (db *Storage) Lyric(ctx context.Context,
 
 	var lyrics models.Lyrics
 
-	// Обрабатываем результаты
 	for rows.Next() {
 		var lyric models.Lyric
 		if err := rows.Scan(&lyric.VerseNumber, &lyric.Text); err != nil {
@@ -215,12 +182,10 @@ func (db *Storage) Lyric(ctx context.Context,
 		lyrics = append(lyrics, lyric)
 	}
 
-	// Проверяем ошибки при итерации
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	// Фиксируем транзакцию
 	if err = tx.Commit(ctx); err != nil {
 		return nil, err
 	}
@@ -232,26 +197,21 @@ func (db *Storage) DeleteSong(ctx context.Context,
 	songName string,
 	groupName string,
 ) (bool, error) {
-	// Проверяем соединение с базой данных
 	if err := db.db.Ping(ctx); err != nil {
 		return false, err
 	}
-
-	// Получаем соединение из пула
 	conn, err := db.db.Acquire(ctx)
 	if err != nil {
 		return false, err
 	}
 	defer conn.Release()
 
-	// Начинаем транзакцию
 	tx, err := conn.Begin(ctx)
 	if err != nil {
 		return false, err
 	}
 	defer tx.Rollback(ctx)
 
-	// SQL-запрос для удаления песни
 	query := `  
         DELETE FROM songs  
         USING groups  
@@ -260,23 +220,20 @@ func (db *Storage) DeleteSong(ctx context.Context,
           AND groups.name = $2  
     `
 
-	// Выполняем запрос
 	cmdTag, err := tx.Exec(ctx, query, songName, groupName)
 	if err != nil {
 		return false, err
 	}
 
-	// Проверяем, была ли удалена хотя бы одна строка
 	if cmdTag.RowsAffected() == 0 {
-		return false, nil // Песня не найдена
+		return false, nil
 	}
 
-	// Фиксируем транзакцию
 	if err = tx.Commit(ctx); err != nil {
 		return false, err
 	}
 
-	return true, nil // Песня успешно удалена
+	return true, nil
 }
 
 func (db *Storage) InsertSong(
@@ -334,7 +291,6 @@ func (db *Storage) InsertSong(
 		}
 	}
 
-	// Фиксируем транзакцию
 	if err = tx.Commit(ctx); err != nil {
 		return false, err
 	}

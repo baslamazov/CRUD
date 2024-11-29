@@ -3,7 +3,7 @@ services:
     build:
       context: ./internal/storage/postgres
       dockerfile: Dockerfile
-    image: postgresdb:1.0  # Используем ранее созданный образ
+    image: postgresdb:1.0
     container_name: postgres-container
     ports:
       - "5433:5432"
