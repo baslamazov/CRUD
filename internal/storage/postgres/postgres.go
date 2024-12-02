@@ -296,3 +296,61 @@ func (db *Storage) InsertSong(
 	}
 	return true, nil
 }
+func (db *Storage) UpdateSong(
+	ctx context.Context,
+	song models.Song,
+) (bool, error) {
+	if err := db.db.Ping(ctx); err != nil {
+		return false, err
+	}
+
+	conn, err := db.db.Acquire(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer conn.Release()
+
+	// Начинаем транзакцию
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer tx.Rollback(ctx)
+
+	var exists bool
+	checkQuery := `  
+		SELECT EXISTS(  
+			SELECT 1   
+			FROM songs s  
+			JOIN groups g ON s.group_id = g.id  
+			WHERE s.name = $1 AND g.name = $2  
+		)  
+	`
+	err = tx.QueryRow(ctx, checkQuery, song.Name, song.GroupName).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	if !exists {
+		return false, sql.ErrNoRows // fmt.Errorf("песня '%s' группы '%s' не найдена", song.Name, song.GroupName)
+	}
+
+	updateQuery := `  
+		UPDATE songs  
+		SET name = \$1, release_date = \$2, link = \$3  
+		WHERE name = \$4 AND group_id = (  
+			SELECT id FROM groups WHERE name = \$5  
+		)  
+	`
+
+	_, err = tx.Exec(ctx, updateQuery, song.Name, song.ReleaseDate, song.Link, song.Name, song.GroupName)
+	if err != nil {
+		return false, err
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

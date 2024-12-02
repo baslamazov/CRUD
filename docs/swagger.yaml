@@ -1,0 +1,212 @@
+definitions:
+  models.Lyric:
+    properties:
+      text:
+        description: Текст куплета
+        example: Hey Jude, don't make it bad
+        type: string
+      verse_number:
+        description: Номер куплета
+        example: 1
+        type: integer
+    type: object
+  models.Song:
+    properties:
+      group_name:
+        description: Название группы
+        example: The Beatles
+        type: string
+      id:
+        description: Уникальный идентификатор песни
+        example: "101"
+        type: string
+      link:
+        description: Ссылка на песню
+        example: http://example.com/song/101
+        type: string
+      release_date:
+        description: Дата релиза
+        example: "1968-08-26"
+        type: string
+      song:
+        description: Название песни
+        example: Hey Jude
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /library/lyric:
+    get:
+      consumes:
+      - application/json
+      description: Получить текст песни по имени группы и имени песни
+      parameters:
+      - description: Имя группы
+        in: query
+        name: group
+        required: true
+        type: string
+      - description: Имя песни
+        in: query
+        name: song
+        required: true
+        type: string
+      - description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - description: Лимит
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Lyric'
+            type: array
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Получить текст песни
+      tags:
+      - lyrics
+  /library/song:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить песню по имени группы и имени песни
+      parameters:
+      - description: Имя группы
+        in: query
+        name: group
+        required: true
+        type: string
+      - description: Имя песни
+        in: query
+        name: song
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+      summary: Удалить песню
+      tags:
+      - songs
+    get:
+      consumes:
+      - application/json
+      description: Получить песню по имени группы и имени песни
+      parameters:
+      - description: Имя группы
+        in: query
+        name: group
+        required: true
+        type: string
+      - description: Имя песни
+        in: query
+        name: song
+        required: true
+        type: string
+      - description: Дата релиза
+        in: query
+        name: release_date
+        type: string
+      - description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - description: Лимит
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Song'
+            type: array
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: Получить песню
+      tags:
+      - songs
+    post:
+      consumes:
+      - application/json
+      description: Добавить новую песню
+      parameters:
+      - description: Песня
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.Song'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: success
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: Добавить песню
+      tags:
+      - songs
+    put:
+      consumes:
+      - application/json
+      description: Обновить существующую песню
+      parameters:
+      - description: Имя группы
+        in: query
+        name: group
+        required: true
+        type: string
+      - description: Имя песни
+        in: query
+        name: song
+        required: true
+        type: string
+      - description: Песня
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.Song'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: success
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: Обновить песню
+      tags:
+      - songs
+swagger: "2.0"

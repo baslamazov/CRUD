@@ -20,12 +20,16 @@ type Service struct {
 	tokenTTL        time.Duration
 }
 
-//go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=URLSaver
+//go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=SongSaver
 type SongSaver interface {
 	InsertSong(
 		ctx context.Context,
 		song models.Song,
 		songDetail models.SongDetail,
+	) (bool, error)
+	UpdateSong(
+		ctx context.Context,
+		song models.Song,
 	) (bool, error)
 }
 type SongDeleter interface {
@@ -144,6 +148,15 @@ func (s *Service) DeleteSong(ctx context.Context,
 	groupName string,
 ) (bool, error) {
 	success, err := s.songDeleter.DeleteSong(ctx, songName, groupName)
+	if err != nil {
+		return success, err
+	}
+	return success, nil
+}
+func (s *Service) UpdateSong(ctx context.Context,
+	song models.Song,
+) (bool, error) {
+	success, err := s.songSaver.UpdateSong(ctx, song)
 	if err != nil {
 		return success, err
 	}
