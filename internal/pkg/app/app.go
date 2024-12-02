@@ -1,5 +1,6 @@
 package app
 
+//swag init -g ".\internal\pkg\app\app.go"
 import (
 	_ "EffectiveMobile/docs"
 	"EffectiveMobile/internal/config"
@@ -31,14 +32,13 @@ func New(conf *config.Config, log *slog.Logger) (*App, error) {
 	return app, nil
 }
 
-// @title Swagger Example API
+// @title Library API
 // @version 1.0
-// @description This is a sample server Petstore server.
-// @termsOfService http://swagger.io/terms/
+// @description REST API для библиотеки с музыкой.
 
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
+// @contact.name Bagrat
+// @contact.url https://t.me/gigbago
+// @contact.email baslamazov@outlook.com
 
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html

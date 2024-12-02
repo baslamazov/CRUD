@@ -75,20 +75,16 @@ func (s *Service) NewSong(ctx context.Context,
 
 	apiUrl := os.Getenv("API_URL")
 
-	// Проверка наличия слеша в конце apiUrl
 	if !strings.HasSuffix(apiUrl, "/") {
 		apiUrl += "/"
 	}
 
-	// Формирование параметров запроса
 	params := url.Values{}
 	params.Add("group", song.GroupName)
 	params.Add("song", song.Name)
 
-	// Формирование полного URL запроса
 	apiEndpoint := apiUrl + "info" + "?" + params.Encode()
 
-	// Запрос к внешнему API
 	resp, err := http.Get(apiEndpoint)
 	if err != nil {
 		s.log.Error("Ошибка запроса к внешнему API")

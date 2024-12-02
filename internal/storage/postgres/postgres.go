@@ -337,9 +337,9 @@ func (db *Storage) UpdateSong(
 
 	updateQuery := `  
 		UPDATE songs  
-		SET name = \$1, release_date = \$2, link = \$3  
-		WHERE name = \$4 AND group_id = (  
-			SELECT id FROM groups WHERE name = \$5  
+		SET name = $1, release_date = $2, link = $3  
+		WHERE name = $4 AND group_id = (  
+			SELECT id FROM groups WHERE name = $5  
 		)  
 	`
 
