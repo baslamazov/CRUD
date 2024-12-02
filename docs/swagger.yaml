@@ -33,8 +33,19 @@ definitions:
         example: Hey Jude
         type: string
     type: object
+host: localhost:3000
 info:
-  contact: {}
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server Petstore server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
 paths:
   /library/lyric:
     get:
@@ -114,12 +125,10 @@ paths:
       - description: Имя группы
         in: query
         name: group
-        required: true
         type: string
       - description: Имя песни
         in: query
         name: song
-        required: true
         type: string
       - description: Дата релиза
         in: query

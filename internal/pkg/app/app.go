@@ -43,8 +43,7 @@ func New(conf *config.Config, log *slog.Logger) (*App, error) {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host petstore.swagger.io
-// @BasePath /v2
+// @host localhost:3000
 func (app *App) Start() error {
 	r := chi.NewRouter()
 

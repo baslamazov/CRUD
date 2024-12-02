@@ -22,8 +22,8 @@ func New(service *services.Service) *Endpoint {
 // @Tags songs
 // @Accept json
 // @Produce json
-// @Param group query string true "Имя группы"
-// @Param song query string true "Имя песни"
+// @Param group query string false "Имя группы"
+// @Param song query string false "Имя песни"
 // @Param release_date query string false "Дата релиза"
 // @Param page query int false "Номер страницы"
 // @Param limit query int false "Лимит"
