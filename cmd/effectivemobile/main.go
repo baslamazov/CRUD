@@ -1,8 +1,8 @@
 package main
 
 import (
-	"EffectiveMobile/internal/config"
-	"EffectiveMobile/internal/pkg/app"
+	"CRUD/internal/config"
+	"CRUD/internal/pkg/app"
 	"log/slog"
 	"os"
 	"os/signal"

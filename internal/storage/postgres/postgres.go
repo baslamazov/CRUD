@@ -1,8 +1,8 @@
 package postgres
 
 import (
-	"EffectiveMobile/internal/config"
-	"EffectiveMobile/internal/domain/models"
+	"CRUD/internal/config"
+	"CRUD/internal/domain/models"
 	"context"
 	"database/sql"
 	"errors"

@@ -1,8 +1,8 @@
 package endpoint
 
 import (
-	"EffectiveMobile/internal/domain/models"
-	"EffectiveMobile/internal/services"
+	"CRUD/internal/domain/models"
+	"CRUD/internal/services"
 	"io"
 	"net/http"
 	"strconv"

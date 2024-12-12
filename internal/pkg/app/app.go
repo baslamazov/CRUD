@@ -2,11 +2,11 @@ package app
 
 //swag init -g ".\internal\pkg\app\app.go"
 import (
-	_ "EffectiveMobile/docs"
-	"EffectiveMobile/internal/config"
-	"EffectiveMobile/internal/endpoint"
-	"EffectiveMobile/internal/services"
-	"EffectiveMobile/internal/storage/postgres"
+	_ "CRUD/docs"
+	"CRUD/internal/config"
+	"CRUD/internal/endpoint"
+	"CRUD/internal/services"
+	"CRUD/internal/storage/postgres"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/swaggo/http-swagger/v2"

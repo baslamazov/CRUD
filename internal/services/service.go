@@ -1,7 +1,7 @@
 package services
 
 import (
-	"EffectiveMobile/internal/domain/models"
+	"CRUD/internal/domain/models"
 	"context"
 	"io"
 	"log/slog"
